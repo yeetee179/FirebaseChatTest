@@ -7,6 +7,34 @@
     android:orientation="vertical"
     tools:context="y.t.x.firebasechattest.MainActivity">
 
+    <EditText
+        android:id="@+id/new_email_field"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="New Email"
+        android:inputType="textEmailAddress" />
+
+    <Button
+        android:id="@+id/new_email_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Change to the new email above" />
+
+    <EditText
+        android:id="@+id/new_password_field"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="New Password"
+        android:inputType="textPassword" />
+
+    <Button
+        android:id="@+id/new_password_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Change to the new password above" />
+
     <Button
         android:id="@+id/sign_out_button"
         android:layout_width="match_parent"
