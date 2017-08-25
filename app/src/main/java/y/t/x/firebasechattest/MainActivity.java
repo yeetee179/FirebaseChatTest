@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -42,6 +43,14 @@ public class MainActivity extends AppCompatActivity {
         newEmailBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v){
+
+                if(TextUtils.isEmpty(newEmail.getText().toString().trim())){
+                    Toast.makeText(getApplicationContext(), "Enter new email address!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+
+
                 user.updateEmail(newEmail.getText().toString().trim()).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
@@ -60,6 +69,17 @@ public class MainActivity extends AppCompatActivity {
         newPasswordBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v){
+
+                if(TextUtils.isEmpty(newPassword.getText().toString().trim())){
+                    Toast.makeText(getApplicationContext(), "Enter new password!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                if(newPassword.getText().toString().trim().length() < 6){
+                    Toast.makeText(getApplicationContext(), "Password too short! At least length 6", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 user.updatePassword(newPassword.getText().toString().trim()).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
