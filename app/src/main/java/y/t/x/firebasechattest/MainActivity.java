@@ -17,111 +17,61 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 public class MainActivity extends AppCompatActivity {
-
-    private EditText newEmail, newPassword;
-    private Button signOutBtn, deleteBtn, newEmailBtn, newPasswordBtn;
+    private Button accountBtn;
     private FirebaseAuth auth;
+    private FirebaseAuth.AuthStateListener authListener;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        newEmail = (EditText) findViewById(R.id.new_email_field);
-        newPassword = (EditText) findViewById(R.id.new_password_field);
-        signOutBtn = (Button) findViewById(R.id.sign_out_button);
-        deleteBtn = (Button) findViewById(R.id.delete_account_button);
-        newEmailBtn = (Button) findViewById(R.id.new_email_button);
-        newPasswordBtn = (Button) findViewById(R.id.new_password_button);
+
+        accountBtn = (Button) findViewById(R.id.account_button);
 
         //get firebase auth instance
         auth = FirebaseAuth.getInstance();
-
         //get current user
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-
-        //reset email
-        newEmailBtn.setOnClickListener(new View.OnClickListener() {
+        //get the current session state
+        authListener = new FirebaseAuth.AuthStateListener() {
             @Override
-            public void onClick(View v){
-
-                if(TextUtils.isEmpty(newEmail.getText().toString().trim())){
-                    Toast.makeText(getApplicationContext(), "Enter new email address!", Toast.LENGTH_SHORT).show();
-                    return;
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if (user == null) {
+                    // user auth state is changed - user is null
+                    // launch login activity
+                    startActivity(new Intent(MainActivity.this, SignUpActivity.class));
+                    finish();
                 }
+            }
+        };
 
-
-
-                user.updateEmail(newEmail.getText().toString().trim()).addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()){
-                            Toast.makeText(MainActivity.this, "Email address updated",Toast.LENGTH_SHORT).show();
-                        }
-                        else {
-                            Toast.makeText(MainActivity.this, "Email address update failed",Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
+        accountBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, AccountSettingActivity.class);
+                startActivity(intent);
             }
         });
 
-        //reset password
-        newPasswordBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v){
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
 
-                if(TextUtils.isEmpty(newPassword.getText().toString().trim())){
-                    Toast.makeText(getApplicationContext(), "Enter new password!", Toast.LENGTH_SHORT).show();
-                    return;
-                }
+    @Override
+    public void onStart() {
+        super.onStart();
+        auth.addAuthStateListener(authListener);
+    }
 
-                if(newPassword.getText().toString().trim().length() < 6){
-                    Toast.makeText(getApplicationContext(), "Password too short! At least length 6", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                user.updatePassword(newPassword.getText().toString().trim()).addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()){
-                            Toast.makeText(MainActivity.this, "Password updated",Toast.LENGTH_SHORT).show();
-                        }
-                        else {
-                            Toast.makeText(MainActivity.this, "Password update failed",Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-            }
-        });
-
-        //signout
-        signOutBtn.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick (View v) {
-                auth.signOut();
-                startActivity(new Intent(MainActivity.this, SignUpActivity.class));
-            }
-        });
-
-        //delete account
-        deleteBtn.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick (View v) {
-                if (user != null){
-                    user.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            if(task.isSuccessful()){
-                                Toast.makeText(MainActivity.this, "Your Profile has been deleted",Toast.LENGTH_SHORT).show();
-                            }
-                            else{
-                                Toast.makeText(MainActivity.this, "Your Profile has been deleted",Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    });
-                }
-                startActivity(new Intent(MainActivity.this, SignUpActivity.class));
-            }
-        });
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (authListener != null) {
+            auth.removeAuthStateListener(authListener);
+        }
     }
 }
